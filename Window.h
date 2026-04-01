@@ -2,7 +2,7 @@
 
 #include <string>
 
-struct GLFWwindow; // Forward declaration
+struct GLFWwindow;
 
 class Window
 {
@@ -10,17 +10,18 @@ public:
     Window(const std::string& title, int width, int height);
     ~Window();
 
-    // Delete copy/move
     Window(const Window&) = delete;
     Window& operator=(const Window&) = delete;
 
     void PollEvents();
     bool ShouldClose() const;
 
-    // Accessors
     int GetWidth() const { return m_width; }
     int GetHeight() const { return m_height; }
     GLFWwindow* GetNativeWindow() const { return m_window; }
+
+    // Make OpenGL context current for this window
+    void MakeContextCurrent();
 
 private:
     GLFWwindow* m_window = nullptr;
