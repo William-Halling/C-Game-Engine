@@ -7,10 +7,17 @@ Window::Window(const std::string& title, int width, int height)
     : m_width(width), m_height(height), m_title(title)
 {
     if (!glfwInit())
-      throw std::runtime_error("Failed to initialize GLFW");
+        throw std::runtime_error("Failed to initialize GLFW");
 
     glfwSetErrorCallback(ErrorCallback);
-    glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API); // For Vulkan; adjust for OpenGL
+
+    // OpenGL hints
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+#ifdef __APPLE__
+    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+#endif
 
     m_window = glfwCreateWindow(width, height, title.c_str(), nullptr, nullptr);
     if (!m_window)
@@ -19,18 +26,16 @@ Window::Window(const std::string& title, int width, int height)
         throw std::runtime_error("Failed to create window");
     }
 
-    // Store pointer to this instance for callbacks
     glfwSetWindowUserPointer(m_window, this);
+    MakeContextCurrent(); // context is now current
 }
 
 
 Window::~Window()
 {
-  if (m_window)
-  {      
-    glfwDestroyWindow(m_window);
-  }
-  glfwTerminate();
+    if (m_window)
+        glfwDestroyWindow(m_window);
+    glfwTerminate();
 }
 
 
@@ -43,6 +48,12 @@ void Window::PollEvents()
 bool Window::ShouldClose() const
 {
     return glfwWindowShouldClose(m_window);
+}
+
+
+void Window::MakeContextCurrent()
+{
+    glfwMakeContextCurrent(m_window);
 }
 
 
